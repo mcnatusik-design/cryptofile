@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/macally/cryptofile/build-test/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

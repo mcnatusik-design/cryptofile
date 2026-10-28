@@ -1,0 +1,4 @@
+core 1 1.67815
+cli_version 1 0.0118542
+cli_bad_args 1 0.0124063
+---
