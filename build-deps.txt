@@ -1,0 +1,6 @@
+build-essential
+cmake
+pkgconf
+libsodium-dev
+dpkg-dev
+lintian
