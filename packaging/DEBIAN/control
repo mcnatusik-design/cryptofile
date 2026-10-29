@@ -1,0 +1,9 @@
+Package: cryptofile
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: @ARCH@
+Depends: @DEPENDS@
+Maintainer: mcnatusik-design <mcnatusik@gmail.com>
+Description: File encryption utility
+ Encrypts and decrypts files using XChaCha20-Poly1305 and Argon2.
