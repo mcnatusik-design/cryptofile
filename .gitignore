@@ -6,3 +6,7 @@ dist/
 debian/
 .vscode/
 .idea/
+*.enc
+test_*.txt
+empty_*.txt
+large_*.txt
