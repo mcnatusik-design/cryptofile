@@ -1,1 +1,0 @@
-/usr/bin/cc --coverage -fsanitize=address,undefined -g --coverage -fsanitize=address,undefined -Wl,--dependency-file=CMakeFiles/test_core.dir/link.d CMakeFiles/test_core.dir/tests/test_core.c.o -o test_core  libcore.a /usr/lib/aarch64-linux-gnu/libsodium.so
