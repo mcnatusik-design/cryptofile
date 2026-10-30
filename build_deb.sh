@@ -3,6 +3,12 @@
 set -eu
 NAME=cryptofile
 VERSION=$(cat VERSION)
+if [ -n "${GITHUB_REF_NAME:-}" ]; then
+    if [ "v${VERSION}" != "$GITHUB_REF_NAME" ]; then
+        echo "Error: Version in VERSION ($VERSION) does not match tag ($GITHUB_REF_NAME)"
+        exit 1
+    fi
+fi
 ARCH=$(dpkg --print-architecture)
 ROOT=build/pkg/${NAME}_${VERSION}_${ARCH}
 

@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [ "**" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          xargs -a build-deps.txt sudo apt-get install -y
+          sudo apt-get install -y cppcheck
+          
+      - name: Configure CMake (Release)
+        run: cmake -S . -B build -DCMAKE_C_FLAGS=-Werror -DBUILD_TESTING=OFF
+        
+      - name: Build
+        run: cmake --build build
+        
+      - name: Static Analysis (cppcheck)
+        run: cppcheck --enable=warning,style,performance --error-exitcode=1 -q src
+
+  test:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          xargs -a build-deps.txt sudo apt-get install -y
+          sudo apt-get install -y gcovr
+          
+      - name: Configure CMake (Debug with Sanitizers)
+        run: cmake -S . -B build-test -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="--coverage -fsanitize=address,undefined" -DCMAKE_EXE_LINKER_FLAGS="--coverage -fsanitize=address,undefined"
+        
+      - name: Build Tests
+        run: cmake --build build-test
+        
+      - name: Run Tests
+        run: ctest --test-dir build-test --output-on-failure --output-junit junit.xml
+        
+      - name: Check Coverage
+        run: gcovr --root . --filter src/core --fail-under-line 70 build-test
+        
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-report
+          path: build-test/junit.xml
+
+  package:
+    needs: test
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          xargs -a build-deps.txt sudo apt-get install -y
+          sudo apt-get install -y dpkg-dev lintian
+          
+      - name: Build Debian Package
+        run: ./build_deb.sh
+        
+      - name: Lintian Check
+        run: lintian --fail-on error dist/*.deb
+        
+      - name: Upload Deb Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: dist/*.deb
+
+  release:
+    needs: package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/download-artifact@v4
+        with:
+          name: deb
+          path: dist
+          
+      - name: Create Release
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=$(cat VERSION)
+          if [ "$TAG" != "v$VERSION" ]; then echo "Version mismatch!"; exit 1; fi
+          gh release create "$TAG" dist/*.deb --title "Release $TAG" --notes "Automated release"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
