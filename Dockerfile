@@ -6,8 +6,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Копируем наш собранный deb-пакет
-COPY dist/cryptofile_0.2.0_arm64.deb /tmp/app.deb
-
+COPY dist/*.deb /tmp/app.deb
 # Устанавливаем пакет (зависимости подтянутся автоматически) и удаляем его
 RUN apt-get update && \
     apt-get install -y --no-install-recommends /tmp/app.deb && \
