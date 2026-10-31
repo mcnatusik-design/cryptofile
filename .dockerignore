@@ -1,0 +1,8 @@
+.git
+build/
+build-test/
+tests/
+*.o
+*.deb
+.vscode/
+.idea/

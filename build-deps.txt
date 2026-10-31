@@ -4,3 +4,4 @@ pkgconf
 libsodium-dev
 dpkg-dev
 lintian
+libmicrohttpd-dev
