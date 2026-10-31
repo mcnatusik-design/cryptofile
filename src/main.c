@@ -1,4 +1,5 @@
 #include "core.h"
+#include "server.h"
 #include <sodium.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +15,7 @@ void print_help(const char *prog) {
     printf("  encrypt <in> <out> -p <password>  Encrypt file\n");
     printf("  decrypt <in> <out> -p <password>  Decrypt file\n");
     printf("  genkey                            Generate a random key (hex)\n");
+    printf("  serve                             Start HTTP server on port 8080\n");
     printf("  --version                         Show version\n");
     printf("  --help                            Show this help\n");
 }
@@ -44,6 +46,10 @@ int main(int argc, char *argv[]) {
         cf_gen_key(hex, sizeof(hex));
         printf("%s\n", hex);
         return 0;
+    }
+
+    if (strcmp(argv[1], "serve") == 0) {
+        return start_server(8080, APP_VERSION);
     }
 
     if (strcmp(argv[1], "encrypt") == 0 || strcmp(argv[1], "decrypt") == 0) {

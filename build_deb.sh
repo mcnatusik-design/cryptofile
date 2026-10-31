@@ -3,9 +3,10 @@
 set -eu
 NAME=cryptofile
 VERSION=$(cat VERSION)
-if [ -n "${GITHUB_REF_NAME:-}" ]; then
-    if [ "v${VERSION}" != "$GITHUB_REF_NAME" ]; then
-        echo "Error: Version in VERSION ($VERSION) does not match tag ($GITHUB_REF_NAME)"
+if [ -n "${GITHUB_REF:-}" ] && [ "${GITHUB_REF#refs/tags/}" != "${GITHUB_REF}" ]; then
+    TAG_NAME=${GITHUB_REF#refs/tags/}
+    if [ "v${VERSION}" != "$TAG_NAME" ]; then
+        echo "Error: Version in VERSION ($VERSION) does not match tag ($TAG_NAME)"
         exit 1
     fi
 fi
