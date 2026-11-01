@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 static const char *app_version = "0.0.0";
+
 static enum MHD_Result answer_to_connection(void *cls, struct MHD_Connection *connection,
                                 const char *url, const char *method,
                                 const char *version, const char *upload_data,
@@ -21,7 +22,11 @@ static enum MHD_Result answer_to_connection(void *cls, struct MHD_Connection *co
     } else if (strcmp(url, "/ready") == 0) {
         page = "OK";
     } else if (strcmp(url, "/version") == 0) {
-        page = app_version;
+        static char version_buf[256];
+        char hostname[64];
+        gethostname(hostname, sizeof(hostname));
+        snprintf(version_buf, sizeof(version_buf), "%s (host: %s)", app_version, hostname);
+        page = version_buf;
     } else {
         page = "404 Not Found";
         status_code = MHD_HTTP_NOT_FOUND;
@@ -46,7 +51,6 @@ int start_server(int port, const char *version) {
 
     printf("Server running on port %d...\n", port);
     
-    // Бесконечный цикл, чтобы сервер работал
     while (1) {
         sleep(1);
     }
@@ -54,3 +58,4 @@ int start_server(int port, const char *version) {
     MHD_stop_daemon(daemon);
     return 0;
 }
+

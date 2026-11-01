@@ -1,14 +1,15 @@
 FROM ubuntu:24.04
 
 # Устанавливаем curl для HEALTHCHECK
-RUN apt-get update && \
+RUN apt-get -o Acquire::Check-Date=false update && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Копируем наш собранный deb-пакет
 COPY dist/*.deb /tmp/app.deb
+
 # Устанавливаем пакет (зависимости подтянутся автоматически) и удаляем его
-RUN apt-get update && \
+RUN apt-get -o Acquire::Check-Date=false update && \
     apt-get install -y --no-install-recommends /tmp/app.deb && \
     rm -rf /var/lib/apt/lists/* /tmp/app.deb
 
