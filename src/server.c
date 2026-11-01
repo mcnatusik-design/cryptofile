@@ -18,6 +18,8 @@ static enum MHD_Result answer_to_connection(void *cls, struct MHD_Connection *co
 
     if (strcmp(url, "/health") == 0) {
         page = "OK";
+    } else if (strcmp(url, "/ready") == 0) {
+        page = "OK";
     } else if (strcmp(url, "/version") == 0) {
         page = app_version;
     } else {
